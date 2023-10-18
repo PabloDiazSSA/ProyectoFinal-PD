@@ -1,2 +1,2 @@
-# ProyectoFinal-PD
-Contiene el proyecto final como entregable...
+# ProyectoFinal
+Proyecto inicial.s
