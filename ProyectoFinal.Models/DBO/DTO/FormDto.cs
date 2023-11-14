@@ -11,13 +11,6 @@ namespace ProyectoFinal.Models.DBO.DTO
 {
     public class FormDto
     {
-        public FormDto()
-        {
-            Regex removeHTMLtagsRegex = new Regex("<(?:\"[^\"]*\"['\"]*|'[^']*'['\"]*|[^'\">])+>");
-            string newText = removeHTMLtagsRegex.Replace("<html><body>Hello, <b>world</b>!<br /></body></html>", "");
-
-        }
-
         [Required(ErrorMessage = "The 'name' parameter is required.")]
         [MinLength(2)]
         [MaxLength(30)]

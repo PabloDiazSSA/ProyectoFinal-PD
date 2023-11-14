@@ -12,10 +12,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Xml.Linq;
 using ProyectoFinal.Tools;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 
 namespace ProyectoFinal.Api.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "AUTHORIZED")]
     [Route("api/[controller]")]
     [ApiController]
     public class CardController : ControllerBase
@@ -63,10 +64,29 @@ namespace ProyectoFinal.Api.Controllers
                     return response;
                 }
                 response.Error = false;
+                //Get Key from config to encrypt and decript
+                var encrypt = _config.GetSection("Encrypt").Get<EncritpAes>();
+                byte[] key = Encoding.UTF8.GetBytes(encrypt.Key);
+                byte[] iv = Encoding.UTF8.GetBytes(encrypt.Iv);
                 //Save A
                 A = card.CardNumber;
+                //Mask credit Card Number (A)
                 string NM = CardNumberTo.MaskCreditCard(A);
-                response.Data = $"Masked:{NM}";
+                //Encode credit card number with SHA256 (A) And Save like AC 
+                AC = HelperCryptography.EncodeSHA256Hash(A);
+                //Encrypt credit card number with AES256 using hard key (A) And Save like AE
+                AE = HelperCryptography.EncryptStringToBytes_Aes(A, key, iv);
+                //Decrypt credit card number with AES256 using hard key (AE) and Save like B
+                B = HelperCryptography.DecryptStringToBytes_Aes(AE, key, iv);
+                //Encode credit card number with SHA256 (B) and save like BC
+                BC = HelperCryptography.EncodeSHA256Hash(B);
+                //Compare Hashes AC with BC
+                if (AC != BC)
+                {
+                    return response;
+                }
+
+                response.Data = $"Masked:{NM} AC:{AC} BC:{BC}";
                 return response;
             }
             catch (Exception ex)
@@ -77,11 +97,10 @@ namespace ProyectoFinal.Api.Controllers
 
         }
 
-
-        [Authorize(Policy = "Privilegiado")]
         [HttpPost("Set")]
-        public async Task<clsResponse<dynamic>> SetCard(CardNum card)
+        public async Task<clsResponse<dynamic>> SetCard(CardDto card)
         {
+            card.Comment = Tools.Helpers.SanitizeString.RemoveHtml(card.Comment);
             clsResponse<dynamic> response = new clsResponse<dynamic>();
             response.Error = true;
             response.ErrorMessage = "Can not set credit card";
