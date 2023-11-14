@@ -4,14 +4,20 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DocumentationFile>C:\Users\pdiaz\source\GitHub\ProyectoFinal-PD\ProyectoFinal.Api\bin\Debug\net6.0\ProyectoFinal.Api.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.12" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.25.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\ProyectoFinal.Data\ProyectoFinal.Data.csproj" />
+    <ProjectReference Include="..\ProyectoFinal.Models\ProyectoFinal.Models.csproj" />
+    <ProjectReference Include="..\ProyectoFinal.Tools\ProyectoFinal.Tools.csproj" />
   </ItemGroup>
 
 </Project>
